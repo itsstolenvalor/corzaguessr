@@ -898,7 +898,7 @@
   }
 
   & .suggest .active {
-    background: var(--white-layer);
+    background: var(--gradient-background), var(--dark-layer);
   }
 
   & .suggest button:focus-visible {
