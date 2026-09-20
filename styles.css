@@ -800,6 +800,28 @@
     opacity: 1;
   }
 
+  & .guess-prompt {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3em;
+    padding: calc(var(--space) * 2);
+    text-align: center;
+    line-height: 1.15;
+    pointer-events: none;
+  }
+
+  & .guess-prompt span {
+    white-space: nowrap;
+  }
+
+  & .guess:not(:placeholder-shown) + .guess-prompt,
+  &.rules-visible .guess-prompt {
+    visibility: hidden;
+  }
+
   & .ruleset {
     display: flex;
     position: absolute;
@@ -1597,6 +1619,10 @@
       text-indent: 0;
     }
 
+    & .guess-prompt {
+      font-size: clamp(11px, 3.3vw, var(--text-base));
+    }
+
     & .result-track-title {
       white-space: normal;
     }
@@ -1732,6 +1758,11 @@
   }
 
   @media (max-width: 480px) {
+    & .guess-prompt {
+      flex-direction: column;
+      gap: 0;
+    }
+
     & {
       --volume-width: 50px;
     }
