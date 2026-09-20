@@ -811,6 +811,7 @@
     text-align: center;
     line-height: 1.15;
     pointer-events: none;
+    translate: var(--attempt-copy-shift) 0;
   }
 
   & .guess-prompt span {
@@ -1621,6 +1622,7 @@
 
     & .guess-prompt {
       font-size: clamp(11px, 3.3vw, var(--text-base));
+      translate: 0 0;
     }
 
     & .result-track-title {
