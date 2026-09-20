@@ -2944,9 +2944,6 @@ var Application = class {
 function assertNever(value) {
 	throw new Error(`Unsupported application event: ${JSON.stringify(value)}`);
 }
-function formatTrackId(trackId) {
-	return String(trackId).padStart(2, "0");
-}
 var AttemptHistoryView = class {
 	elements;
 	durations;
@@ -3475,7 +3472,9 @@ var Autocomplete = class {
 		} else this.input.removeAttribute("aria-activedescendant");
 	}
 };
-var platformIconRoot = "https://cdn.jsdelivr.net/gh/HankeyThePoo/corzaguessr@34f525cf7189c5f4af1fa2a9daf10d79bb4f0eac/covers";
+function formatTrackId(trackId) {
+	return String(trackId).padStart(2, "0");
+}
 var platformPresentation = {
 	spotify: {
 		label: "Spotify",
@@ -3508,7 +3507,7 @@ function formatReleaseDate(value) {
 var DiscoveryListView = class {
 	count;
 	items;
-	coverUrl;
+	assetUrl;
 	duration;
 	reducedMotion;
 	expandedTrackId = null;
@@ -3517,10 +3516,10 @@ var DiscoveryListView = class {
 	startGauntlet = null;
 	tracks = null;
 	discoveriesSignature = "";
-	constructor(count, items, coverUrl, duration, reducedMotion) {
+	constructor(count, items, assetUrl, duration, reducedMotion) {
 		this.count = count;
 		this.items = items;
-		this.coverUrl = coverUrl;
+		this.assetUrl = assetUrl;
 		this.duration = duration;
 		this.reducedMotion = reducedMotion;
 	}
@@ -3567,7 +3566,7 @@ var DiscoveryListView = class {
 		item.className = "discovery-item discovery-item-known";
 		item.dataset.trackId = String(track.id);
 		item.setAttribute("role", "listitem");
-		const coverUrl = this.coverUrl(track.id);
+		const coverUrl = this.assetUrl(`${formatTrackId(track.id)}.webp`);
 		item.style.setProperty("--discovery-artwork", `url(${JSON.stringify(coverUrl)})`);
 		const detailsId = `corzaguessr-discovery-track-${track.id}`;
 		const toggle = document.createElement("button");
@@ -3632,7 +3631,7 @@ var DiscoveryListView = class {
 			link.title = platform.label;
 			link.setAttribute("aria-label", `Listen to ${track.title} on ${platform.label}`);
 			const icon = document.createElement("img");
-			icon.src = `${platformIconRoot}/${platform.icon}`;
+			icon.src = this.assetUrl(platform.icon);
 			icon.alt = "";
 			icon.width = 30;
 			icon.height = 30;
@@ -4563,7 +4562,7 @@ var GameView = class {
 	preview = null;
 	rulesSignature = "";
 	announcementFrame = 0;
-	constructor(root, initialVolume = 100, coverUrl = (id) => `covers/${formatTrackId(id)}.webp`) {
+	constructor(root, initialVolume = 100, assetUrl = (filename) => `covers/${filename}`) {
 		this.root = root;
 		this.inputModality = this.finePointer.matches ? "pointer-fine" : "pointer-coarse";
 		const styles = getComputedStyle(root);
@@ -4615,7 +4614,7 @@ var GameView = class {
 			positionReveal: this.durations.long
 		}, this.reducedMotion);
 		this.volume = new VolumeControl(this.elements.volumeControl, this.elements.volumeRange, initialVolume);
-		this.discovery = new DiscoveryListView(this.elements.discoveryCount, this.elements.discoveryItems, coverUrl, this.durations.standard, this.reducedMotion);
+		this.discovery = new DiscoveryListView(this.elements.discoveryCount, this.elements.discoveryItems, assetUrl, this.durations.standard, this.reducedMotion);
 		this.progressSummary = new ProgressSummaryView(this.elements.progressBests);
 	}
 	bind(handlers) {
@@ -5106,7 +5105,7 @@ var CatalogSource = class {
 	manifest = null;
 	assetUrl(path) {
 		if (!this.manifest) throw new Error("Catalog assets are not loaded.");
-		return `https://cdn.jsdelivr.net/gh/HankeyThePoo/corzaguessr@${this.manifest.assetRevision}/${path}`;
+		return `https://cdn.jsdelivr.net/gh/itsstolenvalor/corzaguessr@${this.manifest.assetRevision}/${path}`;
 	}
 	constructor(url, fetchCatalog = (input, init) => fetch(input, init)) {
 		this.url = url;
@@ -5186,7 +5185,7 @@ async function initialize(root) {
 	const catalogUrl = new URL("tracks.json", moduleUrl);
 	catalogUrl.search = moduleUrl.search;
 	const catalog = new CatalogSource(catalogUrl);
-	const view = new GameView(root, player.volume, (id) => catalog.assetUrl(`covers/${formatTrackId(id)}.webp`));
+	const view = new GameView(root, player.volume, (filename) => catalog.assetUrl(`covers/${filename}`));
 	ownership = await claimSaveOwnership(navigator.locks);
 	if (pageLeft) {
 		ownership.release();
