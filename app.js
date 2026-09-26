@@ -3280,11 +3280,8 @@ function visibleText(slot) {
 }
 var tokenAliases = {
 	featuring: "feat",
-	feat: "feat",
 	ft: "feat",
-	versus: "vs",
-	vs: "vs",
-	and: "and"
+	versus: "vs"
 };
 function normalizeTrackSearch(value) {
 	return value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[’'‘`]/gu, "").replace(/&/gu, " and ").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(/\s+/u).filter(Boolean).map((word) => tokenAliases[word] ?? word).join(" ");
@@ -4901,7 +4898,7 @@ var GameView = class {
 	}
 	moveResultFocus(key) {
 		const candidates = [this.elements.resultAction, this.elements.resultSecondary];
-		this.cycleFocus(candidates, key, candidates[0], null);
+		this.cycleFocus(candidates, key, candidates[0]);
 	}
 	movePrimaryFocus(key, pointerAnchor) {
 		const elements = {
@@ -4925,10 +4922,10 @@ var GameView = class {
 	focusIfAvailable(element) {
 		if (element && this.canNavigateTo(element)) element.focus({ preventScroll: true });
 	}
-	cycleFocus(candidates, key, recommended, pointerAnchor) {
+	cycleFocus(candidates, key, recommended) {
 		const focusable = candidates.filter((element) => this.canNavigateTo(element));
 		if (!focusable.length) return;
-		const current = pointerAnchor && focusable.includes(pointerAnchor) ? pointerAnchor : document.activeElement;
+		const current = document.activeElement;
 		const currentIndex = focusable.indexOf(current);
 		if (currentIndex < 0) {
 			(focusable.includes(recommended) ? recommended : focusable[0]).focus({ preventScroll: true });
